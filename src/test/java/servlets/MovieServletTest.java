@@ -4,7 +4,6 @@ package servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.impl.ActorDaoImpl;
 import dao.impl.MovieDaoImpl;
-import models.Director;
 import models.Movie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -57,7 +55,7 @@ class MovieServletTest {
 
         List<Movie> movies = Arrays.asList(
                 new Movie(1L, "The Shawshank Redemption", 1994),
-                new Movie(2L,"The Godfather", 1972)
+                new Movie(2L, "The Godfather", 1972)
         );
 
         when(movieDao.findAll()).thenReturn(movies);
@@ -75,7 +73,7 @@ class MovieServletTest {
     void testDoGetMovieWithId() throws IOException {
         when(request.getQueryString()).thenReturn("1");
         when(request.getParameter("id")).thenReturn("1");
-        Movie movie = new Movie(1L,"The Shawshank Redemption", 1994);
+        Movie movie = new Movie(1L, "The Shawshank Redemption", 1994);
 
         when(movieDao.findById(1L)).thenReturn(Optional.ofNullable(movie));
         when(response.getWriter()).thenReturn(writer);
@@ -93,7 +91,7 @@ class MovieServletTest {
         when(request.getParameter("id")).thenReturn(Long.valueOf(1L).toString());
         when(response.getWriter()).thenReturn(writer);
 
-        Movie movie =  new Movie(1L,"The Shawshank Redemption", 1994);
+        Movie movie = new Movie(1L, "The Shawshank Redemption", 1994);
         when(movieDao.findById(1L)).thenReturn(Optional.ofNullable(movie));
         when(movieDao.deleteMovieById(1L)).thenReturn(true);
 

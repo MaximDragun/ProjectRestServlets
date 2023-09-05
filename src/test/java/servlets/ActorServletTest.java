@@ -3,7 +3,6 @@ package servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.impl.ActorDaoImpl;
 import models.Actor;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,8 +49,8 @@ class ActorServletTest {
         when(request.getQueryString()).thenReturn(null);
 
         List<Actor> actorList = Arrays.asList(
-                new Actor(1L,"Brad Pitt", 59),
-                new Actor(2L,"Jennifer Aniston", 51)
+                new Actor(1L, "Brad Pitt", 59),
+                new Actor(2L, "Jennifer Aniston", 51)
         );
 
         when(actorDao.findAll()).thenReturn(actorList);
@@ -69,7 +68,7 @@ class ActorServletTest {
     void testDoGetActorWithId() throws IOException {
         when(request.getQueryString()).thenReturn("1");
         when(request.getParameter("id")).thenReturn("1");
-        Actor actor = new Actor(1L,"Brad Pitt", 59);
+        Actor actor = new Actor(1L, "Brad Pitt", 59);
 
         when(actorDao.findById(1L)).thenReturn(Optional.ofNullable(actor));
         when(response.getWriter()).thenReturn(writer);
@@ -87,7 +86,7 @@ class ActorServletTest {
         when(request.getParameter("id")).thenReturn(Long.valueOf(1L).toString());
         when(response.getWriter()).thenReturn(writer);
 
-        Actor actor =  new Actor(1L,"Brad Pitt", 59);
+        Actor actor = new Actor(1L, "Brad Pitt", 59);
         when(actorDao.findById(1L)).thenReturn(Optional.ofNullable(actor));
         when(actorDao.deleteActorById(1L)).thenReturn(true);
 

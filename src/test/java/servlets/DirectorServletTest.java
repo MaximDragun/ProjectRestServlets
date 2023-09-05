@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,8 +50,8 @@ class DirectorServletTest {
         when(request.getQueryString()).thenReturn(null);
 
         List<Director> directors = Arrays.asList(
-                new Director(1L,"Stanley Kubrick", 56),
-                new Director(2L,"Alfred Hitchcock", 78)
+                new Director(1L, "Stanley Kubrick", 56),
+                new Director(2L, "Alfred Hitchcock", 78)
         );
 
         when(directorDao.findAll()).thenReturn(directors);
@@ -69,7 +69,7 @@ class DirectorServletTest {
     void testDoGetDirectorWithId() throws IOException {
         when(request.getQueryString()).thenReturn("1");
         when(request.getParameter("id")).thenReturn("1");
-        Director director = new Director(1L,"Stanley Kubrick", 56);
+        Director director = new Director(1L, "Stanley Kubrick", 56);
 
         when(directorDao.findById(1L)).thenReturn(Optional.ofNullable(director));
         when(response.getWriter()).thenReturn(writer);
@@ -87,7 +87,7 @@ class DirectorServletTest {
         when(request.getParameter("id")).thenReturn(Long.valueOf(1L).toString());
         when(response.getWriter()).thenReturn(writer);
 
-        Director director =  new Director(1L,"Stanley Kubrick", 56);
+        Director director = new Director(1L, "Stanley Kubrick", 56);
         when(directorDao.findById(1L)).thenReturn(Optional.ofNullable(director));
         when(directorDao.deleteDirectorById(1L)).thenReturn(true);
 

@@ -1,6 +1,6 @@
 package exceptions;
 
-public class MySqlRuntimeException extends RuntimeException{
+public class MySqlRuntimeException extends RuntimeException {
 
     public MySqlRuntimeException(String message) {
         super(message);

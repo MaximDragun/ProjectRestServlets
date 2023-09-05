@@ -15,5 +15,6 @@ public interface MovieDao {
     boolean deleteMovieById(Long id);
 
     Movie updateMovieById(Movie movie);
+
     boolean insertMovieActor(Long movieId, Long actorId);
 }

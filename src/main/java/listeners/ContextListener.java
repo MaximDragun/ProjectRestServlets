@@ -7,7 +7,6 @@ import dao.impl.MovieDaoImpl;
 import dao.interfaces.ActorDao;
 import dao.interfaces.DirectorDao;
 import dao.interfaces.MovieDao;
-import databaseconnaction.DataSourceHikariPostgreSQL;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
