@@ -147,25 +147,16 @@ public class MovieServlet extends HttpServlet {
         }
     }
 
-    public ActorDao getActorDao() {
-        return actorDao;
-    }
 
     public void setActorDao(ActorDao actorDao) {
         this.actorDao = actorDao;
     }
 
-    public MovieDao getMovieDao() {
-        return movieDao;
-    }
 
     public void setMovieDao(MovieDao movieDao) {
         this.movieDao = movieDao;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
 
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;

@@ -3,7 +3,6 @@ package databaseconnaction;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -21,10 +20,6 @@ public class DataSourceHikariPostgreSQL {
 
     public static void setDataSource(HikariDataSource dataSource) {
         DataSourceHikariPostgreSQL.dataSource = dataSource;
-    }
-
-    public static DataSource getHikariDataSource() {
-        return dataSource;
     }
 
 }

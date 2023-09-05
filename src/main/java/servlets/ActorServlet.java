@@ -122,17 +122,10 @@ public class ActorServlet extends HttpServlet {
         }
     }
 
-    public ActorDao getActorDao() {
-        return actorDao;
-    }
-
     public void setActorDao(ActorDao actorDao) {
         this.actorDao = actorDao;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
 
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;

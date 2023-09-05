@@ -124,17 +124,11 @@ public class DirectorServlet extends HttpServlet {
         }
     }
 
-    public DirectorDao getDirectorDao() {
-        return directorDao;
-    }
 
     public void setDirectorDao(DirectorDao directorDao) {
         this.directorDao = directorDao;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
 
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
