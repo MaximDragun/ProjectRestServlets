@@ -12,9 +12,7 @@ public class Actor {
     private Long actorId;
     private String name;
     private int age;
-
     private List<Movie> movieList;
-
     public Actor() {
     }
 

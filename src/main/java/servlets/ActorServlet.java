@@ -2,9 +2,9 @@ package servlets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.interfaces.ActorDao;
 import exceptions.MySqlRuntimeException;
 import models.Actor;
+import services.ActorService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,12 +17,12 @@ import static javax.servlet.http.HttpServletResponse.*;
 
 @WebServlet("/actor")
 public class ActorServlet extends HttpServlet {
-    private ActorDao actorDao;
+    private ActorService actorService;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() {
-        this.actorDao = (ActorDao) getServletContext().getAttribute("actorDao");
+        this.actorService = (ActorService) getServletContext().getAttribute("actorService");
         this.objectMapper = (ObjectMapper) getServletContext().getAttribute("objectMapper");
     }
 
@@ -33,14 +33,14 @@ public class ActorServlet extends HttpServlet {
         try {
             if (pathInfo != null) {
                 long id = Long.parseLong(req.getParameter("id"));
-                if (actorDao.findById(id).isPresent()) {
+                if (actorService.findById(id).isPresent()) {
                     resp.setStatus(SC_OK);
-                    objectMapper.writeValue(resp.getWriter(), actorDao.findById(id).get());
+                    objectMapper.writeValue(resp.getWriter(), actorService.findById(id).get());
                 } else {
                     resp.sendError(SC_BAD_REQUEST, "actor под данным id в базе нет!");
                 }
             } else {
-                List<Actor> actorList = actorDao.findAll();
+                List<Actor> actorList = actorService.findAll();
                 resp.setStatus(SC_OK);
                 objectMapper.writeValue(resp.getWriter(), actorList);
             }
@@ -61,7 +61,7 @@ public class ActorServlet extends HttpServlet {
                 resp.sendError(SC_BAD_REQUEST, "Введите возраст больше 18 и меньше 100!");
             } else {
                 resp.setStatus(SC_OK);
-                objectMapper.writeValue(resp.getWriter(), actorDao.addActor(actor));
+                objectMapper.writeValue(resp.getWriter(), actorService.addActor(actor));
             }
         } catch (MySqlRuntimeException e) {
             resp.sendError(SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -79,13 +79,13 @@ public class ActorServlet extends HttpServlet {
                 resp.sendError(SC_BAD_REQUEST, "Поле запроса пустое");
                 return;
             }
-            if (actorDao.findById(actor.getActorId()).isPresent()) {
+            if (actorService.findById(actor.getActorId()).isPresent()) {
                 int age = actor.getAge();
                 if (age < 18 || age > 100) {
                     resp.sendError(SC_BAD_REQUEST, "Введите возраст больше 18 и меньше 100!");
                 } else {
                     resp.setStatus(SC_OK);
-                    objectMapper.writeValue(resp.getWriter(), actorDao.updateActorById(actor));
+                    objectMapper.writeValue(resp.getWriter(), actorService.updateActorById(actor));
                 }
             } else
                 resp.sendError(SC_NOT_FOUND, "actor с таким id в базе нет!");
@@ -103,8 +103,8 @@ public class ActorServlet extends HttpServlet {
             String id = req.getParameter("id");
             if (id != null) {
                 Long actorId = Long.parseLong(id);
-                if (actorDao.findById(actorId).isPresent()) {
-                    if (actorDao.deleteActorById(actorId)) {
+                if (actorService.findById(actorId).isPresent()) {
+                    if (actorService.deleteActorById(actorId)) {
                         resp.setStatus(SC_OK);
                         resp.getWriter().println("actor успешно удален!");
                     } else {
@@ -122,8 +122,8 @@ public class ActorServlet extends HttpServlet {
         }
     }
 
-    public void setActorDao(ActorDao actorDao) {
-        this.actorDao = actorDao;
+    public void setActorService(ActorService actorService) {
+        this.actorService = actorService;
     }
 
 

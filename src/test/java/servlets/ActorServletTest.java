@@ -1,13 +1,13 @@
 package servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.impl.ActorDaoImpl;
 import models.Actor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import services.ActorService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ActorServletTest {
     @Mock
-    private ActorDaoImpl actorDao;
+    private ActorService actorService;
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -39,7 +39,7 @@ class ActorServletTest {
     public void setUp() {
         actorServlet = new ActorServlet();
         actorServlet.setObjectMapper(new ObjectMapper());
-        actorServlet.setActorDao(actorDao);
+        actorServlet.setActorService(actorService);
         StringWriter stringWriter = new StringWriter();
         writer = new PrintWriter(stringWriter);
     }
@@ -53,14 +53,14 @@ class ActorServletTest {
                 new Actor(2L, "Jennifer Aniston", 51)
         );
 
-        when(actorDao.findAll()).thenReturn(actorList);
+        when(actorService.findAll()).thenReturn(actorList);
         when(response.getWriter()).thenReturn(writer);
 
         actorServlet.doGet(request, response);
 
         verify(response).setContentType("application/json; charset=UTF-8");
 
-        List<Actor> actors = actorDao.findAll();
+        List<Actor> actors = actorService.findAll();
         assertEquals(actorList.size(), actors.size());
     }
 
@@ -70,14 +70,14 @@ class ActorServletTest {
         when(request.getParameter("id")).thenReturn("1");
         Actor actor = new Actor(1L, "Brad Pitt", 59);
 
-        when(actorDao.findById(1L)).thenReturn(Optional.ofNullable(actor));
+        when(actorService.findById(1L)).thenReturn(Optional.ofNullable(actor));
         when(response.getWriter()).thenReturn(writer);
 
         actorServlet.doGet(request, response);
 
         verify(response).setContentType("application/json; charset=UTF-8");
 
-        Actor optionalActor = actorDao.findById(1L).orElse(null);
+        Actor optionalActor = actorService.findById(1L).orElse(null);
         assertEquals(actor.getName(), optionalActor.getName());
     }
 
@@ -87,8 +87,8 @@ class ActorServletTest {
         when(response.getWriter()).thenReturn(writer);
 
         Actor actor = new Actor(1L, "Brad Pitt", 59);
-        when(actorDao.findById(1L)).thenReturn(Optional.ofNullable(actor));
-        when(actorDao.deleteActorById(1L)).thenReturn(true);
+        when(actorService.findById(1L)).thenReturn(Optional.ofNullable(actor));
+        when(actorService.deleteActorById(1L)).thenReturn(true);
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);

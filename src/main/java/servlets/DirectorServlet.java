@@ -2,9 +2,9 @@ package servlets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.interfaces.DirectorDao;
 import exceptions.MySqlRuntimeException;
 import models.Director;
+import services.DirectorService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,12 +17,12 @@ import static javax.servlet.http.HttpServletResponse.*;
 
 @WebServlet("/director")
 public class DirectorServlet extends HttpServlet {
-    private DirectorDao directorDao;
+    private DirectorService directorService;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() {
-        this.directorDao = (DirectorDao) getServletContext().getAttribute("directorDao");
+        this.directorService = (DirectorService) getServletContext().getAttribute("directorService");
         this.objectMapper = (ObjectMapper) getServletContext().getAttribute("objectMapper");
     }
 
@@ -33,15 +33,15 @@ public class DirectorServlet extends HttpServlet {
         try {
             if (pathInfo != null) {
                 long id = Long.parseLong(req.getParameter("id"));
-                if (directorDao.findById(id).isPresent()) {
-                    Director director = directorDao.findById(id).get();
+                if (directorService.findById(id).isPresent()) {
+                    Director director = directorService.findById(id).get();
                     resp.setStatus(SC_OK);
                     objectMapper.writeValue(resp.getWriter(), director);
                 } else {
                     resp.sendError(SC_BAD_REQUEST, "director под данным id в базе нет!");
                 }
             } else {
-                List<Director> directorList = directorDao.findAll();
+                List<Director> directorList = directorService.findAll();
                 resp.setStatus(SC_OK);
                 objectMapper.writeValue(resp.getWriter(), directorList);
             }
@@ -62,7 +62,7 @@ public class DirectorServlet extends HttpServlet {
                 resp.sendError(SC_BAD_REQUEST, "Введите возраст больше 18 и меньше 100!");
             } else {
                 resp.setStatus(SC_OK);
-                objectMapper.writeValue(resp.getWriter(), directorDao.addDirector(director));
+                objectMapper.writeValue(resp.getWriter(), directorService.addDirector(director));
             }
         } catch (MySqlRuntimeException e) {
             resp.sendError(SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -80,13 +80,13 @@ public class DirectorServlet extends HttpServlet {
                 resp.sendError(SC_BAD_REQUEST, "Поле запроса пустое");
                 return;
             }
-            if (directorDao.findById(director.getDirectorId()).isPresent()) {
+            if (directorService.findById(director.getDirectorId()).isPresent()) {
                 int age = director.getAge();
                 if (age < 18 || age > 100) {
                     resp.sendError(SC_BAD_REQUEST, "Введите возраст больше 18 и меньше 100!");
                 } else {
                     resp.setStatus(SC_OK);
-                    objectMapper.writeValue(resp.getWriter(), directorDao.updateDirectorById(director));
+                    objectMapper.writeValue(resp.getWriter(), directorService.updateDirectorById(director));
                 }
             } else {
                 resp.sendError(SC_NOT_FOUND, "director с таким id в базе нет!");
@@ -105,8 +105,8 @@ public class DirectorServlet extends HttpServlet {
             String id = req.getParameter("id");
             if (id != null) {
                 Long directorId = Long.parseLong(id);
-                if (directorDao.findById(directorId).isPresent()) {
-                    if (directorDao.deleteDirectorById(directorId)) {
+                if (directorService.findById(directorId).isPresent()) {
+                    if (directorService.deleteDirectorById(directorId)) {
                         resp.setStatus(SC_OK);
                         resp.getWriter().println("director успешно удален!");
                     } else {
@@ -125,8 +125,8 @@ public class DirectorServlet extends HttpServlet {
     }
 
 
-    public void setDirectorDao(DirectorDao directorDao) {
-        this.directorDao = directorDao;
+    public void setDirectorService(DirectorService directorService) {
+        this.directorService = directorService;
     }
 
 

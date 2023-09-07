@@ -1,7 +1,7 @@
 package dao.impl;
 
 import dao.interfaces.ActorDao;
-import databaseconnaction.DataSourceHikariPostgreSQL;
+import databaseconnaction.DataSourceConnaction;
 import exceptions.MySqlRuntimeException;
 import models.Actor;
 import models.Movie;
@@ -16,9 +16,15 @@ import static dao.impl.ActorDaoImpl.SQLTask.*;
 
 public class ActorDaoImpl implements ActorDao {
 
+    private DataSourceConnaction dataSourceConnaction;
+
+    public ActorDaoImpl(DataSourceConnaction dataSourceConnaction) {
+        this.dataSourceConnaction = dataSourceConnaction;
+    }
+
     @Override
     public Actor addActor(Actor actor) {
-        try (Connection connection = DataSourceHikariPostgreSQL.getConnection();
+        try (Connection connection = dataSourceConnaction.getConnection();
              PreparedStatement pst = connection.prepareStatement(INSERT_ACTOR.QUERY, Statement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, actor.getName());
             pst.setInt(2, actor.getAge());
@@ -39,7 +45,7 @@ public class ActorDaoImpl implements ActorDao {
     @Override
     public Optional<Actor> findById(Long id) {
         Actor actor = null;
-        try (Connection connection = DataSourceHikariPostgreSQL.getConnection();
+        try (Connection connection = dataSourceConnaction.getConnection();
              PreparedStatement pst = connection.prepareStatement(GET_ACTOR_BY_ID.QUERY)) {
             pst.setLong(1, id);
 
@@ -58,7 +64,7 @@ public class ActorDaoImpl implements ActorDao {
     public List<Actor> findAll() {
         List<Actor> actors = new ArrayList<>();
 
-        try (Connection connection = DataSourceHikariPostgreSQL.getConnection();
+        try (Connection connection = dataSourceConnaction.getConnection();
              PreparedStatement pst = connection.prepareStatement(GET_ALL_ACTORS.QUERY);
              ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
@@ -73,7 +79,7 @@ public class ActorDaoImpl implements ActorDao {
     @Override
     public boolean deleteActorById(Long id) {
         int rowsUpdated;
-        try (Connection connection = DataSourceHikariPostgreSQL.getConnection();
+        try (Connection connection = dataSourceConnaction.getConnection();
              PreparedStatement pst = connection.prepareStatement(DELETE_ACTOR_BY_ID.QUERY)) {
             pst.setLong(1, id);
             rowsUpdated = pst.executeUpdate();
@@ -86,7 +92,7 @@ public class ActorDaoImpl implements ActorDao {
     @Override
     public Actor updateActorById(Actor actor) {
         int rowsUpdated;
-        try (Connection connection = DataSourceHikariPostgreSQL.getConnection();
+        try (Connection connection = dataSourceConnaction.getConnection();
              PreparedStatement pst = connection.prepareStatement(UPDATE_ACTOR_BY_ID.QUERY)) {
             pst.setString(1, actor.getName());
             pst.setInt(2, actor.getAge());
@@ -119,7 +125,7 @@ public class ActorDaoImpl implements ActorDao {
     private List<Movie> getActorMovies(Long actorId) {
         List<Movie> movieList = new ArrayList<>();
 
-        try (Connection connection = DataSourceHikariPostgreSQL.getConnection();
+        try (Connection connection = dataSourceConnaction.getConnection();
              PreparedStatement pst = connection.prepareStatement(FIND_AND_GET_ALL_MOVIES.QUERY)) {
             pst.setLong(1, actorId);
 
@@ -154,5 +160,6 @@ public class ActorDaoImpl implements ActorDao {
         }
     }
 
-
+    public ActorDaoImpl() {
+    }
 }

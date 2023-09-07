@@ -1,29 +1,29 @@
 package dao;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import dao.impl.ActorDaoImpl;
 import dao.interfaces.ActorDao;
-import databaseconnaction.DataSourceHikariPostgreSQL;
+import databaseconnaction.DataSourceConnaction;
 import models.Actor;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ActorDaoTest {
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
             .withDatabaseName("project2")
             .withUsername("postgres")
             .withPassword("maxim")
-            .withInitScript("db/migration/V1__Init_DB.sql");
+            .withInitScript("db/NewTables.sql");
 
     ActorDao actorDao;
+    DataSourceConnaction dataSourceConnaction;
 
     @BeforeAll
     static void beforeAll() {
@@ -37,18 +37,14 @@ class ActorDaoTest {
 
     @BeforeEach
     void setUp() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(postgres.getJdbcUrl());
-        config.setUsername(postgres.getUsername());
-        config.setPassword(postgres.getPassword());
-        DataSourceHikariPostgreSQL.setConfig(config);
-        DataSourceHikariPostgreSQL.setDataSource(new HikariDataSource(config));
-        actorDao = new ActorDaoImpl();
+        dataSourceConnaction = new DataSourceConnaction(postgres.getJdbcUrl(),
+                postgres.getUsername(), postgres.getPassword());
+        actorDao = new ActorDaoImpl(dataSourceConnaction);
     }
 
     @AfterEach
     void clearDatabase() {
-        try (Connection connection = DriverManager.getConnection(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())) {
+        try (Connection connection = dataSourceConnaction.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM actor");
         } catch (SQLException e) {
@@ -57,15 +53,14 @@ class ActorDaoTest {
     }
 
     @Test
-    void createActorTest() {
+    void addActorTest() {
         actorDao.addActor(new Actor("Brad Pitt", 59));
         actorDao.addActor(new Actor("Jennifer Aniston", 51));
 
         List<Actor> actors = actorDao.findAll();
 
-        Assertions.assertEquals(2, actors.size());
+        assertEquals(2, actors.size());
     }
-
 
     @Test
     void findOptionalByIdActorTest() {
@@ -73,8 +68,8 @@ class ActorDaoTest {
 
         Optional<Actor> actor = actorDao.findById(newActor.getActorId());
 
-        Assertions.assertNotNull(actor);
-        Assertions.assertTrue(actor.isPresent());
+        assertNotNull(actor);
+        assertTrue(actor.isPresent());
     }
 
     @Test
@@ -83,7 +78,7 @@ class ActorDaoTest {
 
         newActor = actorDao.updateActorById(new Actor(newActor.getActorId(), "Maximus", 27));
 
-        Assertions.assertEquals("Maximus", newActor.getName());
+        assertEquals("Maximus", newActor.getName());
     }
 
     @Test
@@ -94,7 +89,7 @@ class ActorDaoTest {
 
         List<Actor> actors = actorDao.findAll();
 
-        Assertions.assertEquals(3, actors.size());
+        assertEquals(3, actors.size());
     }
 
     @Test
@@ -106,7 +101,7 @@ class ActorDaoTest {
         boolean deleted = actorDao.deleteActorById(newActor1.getActorId());
         List<Actor> actors = actorDao.findAll();
 
-        Assertions.assertEquals(2, actors.size());
-        Assertions.assertTrue(deleted);
+        assertEquals(2, actors.size());
+        assertTrue(deleted);
     }
 }

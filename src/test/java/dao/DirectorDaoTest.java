@@ -4,7 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dao.impl.DirectorDaoImpl;
 import dao.interfaces.DirectorDao;
-import databaseconnaction.DataSourceHikariPostgreSQL;
+import databaseconnaction.DataSourceConnaction;
 import models.Director;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -21,9 +21,10 @@ class DirectorDaoTest {
             .withDatabaseName("project2")
             .withUsername("postgres")
             .withPassword("maxim")
-            .withInitScript("db/migration/V1__Init_DB.sql");
+            .withInitScript("db/NewTables.sql");
 
     DirectorDao directorDao;
+    DataSourceConnaction dataSourceConnaction;
 
     @BeforeAll
     static void beforeAll() {
@@ -37,18 +38,14 @@ class DirectorDaoTest {
 
     @BeforeEach
     void setUp() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(postgres.getJdbcUrl());
-        config.setUsername(postgres.getUsername());
-        config.setPassword(postgres.getPassword());
-        DataSourceHikariPostgreSQL.setConfig(config);
-        DataSourceHikariPostgreSQL.setDataSource(new HikariDataSource(config));
-        directorDao = new DirectorDaoImpl();
+        dataSourceConnaction = new DataSourceConnaction(postgres.getJdbcUrl(),
+                postgres.getUsername(), postgres.getPassword());
+        directorDao = new DirectorDaoImpl(dataSourceConnaction);
     }
 
     @AfterEach
     void clearDatabase() {
-        try (Connection connection = DriverManager.getConnection(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())) {
+        try (Connection connection = dataSourceConnaction.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM director");
         } catch (SQLException e) {
@@ -57,7 +54,7 @@ class DirectorDaoTest {
     }
 
     @Test
-    void createDirectorTest() {
+    void addDirectorTest() {
         directorDao.addDirector(new Director("Stanley Kubrick", 56));
         directorDao.addDirector(new Director("Alfred Hitchcock", 78));
 

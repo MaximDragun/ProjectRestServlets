@@ -2,11 +2,11 @@ package servlets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.interfaces.ActorDao;
-import dao.interfaces.MovieDao;
 import exceptions.MySqlRuntimeException;
 import models.Actor;
 import models.Movie;
+import services.ActorService;
+import services.MovieService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,14 +19,14 @@ import static javax.servlet.http.HttpServletResponse.*;
 
 @WebServlet("/movie")
 public class MovieServlet extends HttpServlet {
-    private ActorDao actorDao;
-    private MovieDao movieDao;
+    private ActorService actorService;
+    private MovieService movieService;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() {
-        this.actorDao = (ActorDao) getServletContext().getAttribute("actorDao");
-        this.movieDao = (MovieDao) getServletContext().getAttribute("movieDao");
+        this.actorService = (ActorService) getServletContext().getAttribute("actorService");
+        this.movieService = (MovieService) getServletContext().getAttribute("movieService");
         this.objectMapper = (ObjectMapper) getServletContext().getAttribute("objectMapper");
     }
 
@@ -37,15 +37,15 @@ public class MovieServlet extends HttpServlet {
         try {
             if (pathInfo != null) {
                 long id = Long.parseLong(req.getParameter("id"));
-                if (movieDao.findById(id).isPresent()) {
-                    Movie movie = movieDao.findById(id).get();
+                if (movieService.findById(id).isPresent()) {
+                    Movie movie = movieService.findById(id).get();
                     resp.setStatus(SC_OK);
                     objectMapper.writeValue(resp.getWriter(), movie);
                 } else {
                     resp.sendError(SC_BAD_REQUEST, "movie под данным id в базе нет!");
                 }
             } else {
-                List<Movie> movieList = movieDao.findAll();
+                List<Movie> movieList = movieService.findAll();
                 resp.setStatus(SC_OK);
                 objectMapper.writeValue(resp.getWriter(), movieList);
             }
@@ -68,13 +68,13 @@ public class MovieServlet extends HttpServlet {
                 Long movieIdLong = Long.parseLong(movieId);
                 Long actorIdLong = Long.parseLong(actorId);
 
-                Movie movie = movieDao.findById(movieIdLong).orElse(null);
-                Actor actor = actorDao.findById(actorIdLong).orElse(null);
+                Movie movie = movieService.findById(movieIdLong).orElse(null);
+                Actor actor = actorService.findById(actorIdLong).orElse(null);
 
                 if (movie == null || actor == null) {
                     resp.sendError(SC_NOT_FOUND, "Таких фильмов и актеров в базе нет!");
                 } else {
-                    if (movieDao.insertMovieActor(movieIdLong, actorIdLong)) {
+                    if (movieService.insertMovieActor(movieIdLong, actorIdLong)) {
                         resp.setStatus(SC_OK);
                     } else
                         resp.sendError(SC_BAD_REQUEST, "Такая запись в базе уже есть!");
@@ -85,7 +85,7 @@ public class MovieServlet extends HttpServlet {
                     resp.sendError(SC_BAD_REQUEST, "Год должен быть больше 1900ого!");
                 } else {
                     resp.setStatus(SC_OK);
-                    objectMapper.writeValue(resp.getWriter(), movieDao.addMovie(movie));
+                    objectMapper.writeValue(resp.getWriter(), movieService.addMovie(movie));
                 }
             }
         } catch (MySqlRuntimeException e) {
@@ -104,13 +104,13 @@ public class MovieServlet extends HttpServlet {
                 resp.sendError(SC_BAD_REQUEST, "Поле запроса пустое");
                 return;
             }
-            if (movieDao.findById(movie.getMovieId()).isPresent()) {
+            if (movieService.findById(movie.getMovieId()).isPresent()) {
                 int age = movie.getYearOfProduction();
                 if (age <= 1900) {
                     resp.sendError(SC_BAD_REQUEST, "Год должен быть больше 1900ого!");
                 } else {
                     resp.setStatus(SC_OK);
-                    objectMapper.writeValue(resp.getWriter(), movieDao.updateMovieById(movie));
+                    objectMapper.writeValue(resp.getWriter(), movieService.updateMovieById(movie));
                 }
             } else
                 resp.sendError(SC_NOT_FOUND, "movie с таким id в базе нет!");
@@ -128,8 +128,8 @@ public class MovieServlet extends HttpServlet {
             String id = req.getParameter("id");
             if (id != null) {
                 Long movieId = Long.parseLong(id);
-                if (movieDao.findById(movieId).isPresent()) {
-                    if (movieDao.deleteMovieById(movieId)) {
+                if (movieService.findById(movieId).isPresent()) {
+                    if (movieService.deleteMovieById(movieId)) {
                         resp.setStatus(SC_OK);
                         resp.getWriter().println("movie успешно удален!");
                     } else {
@@ -148,13 +148,13 @@ public class MovieServlet extends HttpServlet {
     }
 
 
-    public void setActorDao(ActorDao actorDao) {
-        this.actorDao = actorDao;
+    public void setActorService(ActorService actorService) {
+        this.actorService = actorService;
     }
 
 
-    public void setMovieDao(MovieDao movieDao) {
-        this.movieDao = movieDao;
+    public void setMovieService(MovieService movieService) {
+        this.movieService = movieService;
     }
 
 

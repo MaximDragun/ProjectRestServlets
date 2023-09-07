@@ -2,14 +2,14 @@ package servlets;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.impl.ActorDaoImpl;
-import dao.impl.MovieDaoImpl;
 import models.Movie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import services.ActorService;
+import services.MovieService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,9 +28,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class MovieServletTest {
     @Mock
-    private MovieDaoImpl movieDao;
+    private MovieService movieService;
     @Mock
-    private ActorDaoImpl actorDao;
+    private ActorService actorService;
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -43,8 +43,8 @@ class MovieServletTest {
     public void setUp() {
         movieServlet = new MovieServlet();
         movieServlet.setObjectMapper(new ObjectMapper());
-        movieServlet.setMovieDao(movieDao);
-        movieServlet.setActorDao(actorDao);
+        movieServlet.setMovieService(movieService);
+        movieServlet.setActorService(actorService);
         StringWriter stringWriter = new StringWriter();
         writer = new PrintWriter(stringWriter);
     }
@@ -58,14 +58,14 @@ class MovieServletTest {
                 new Movie(2L, "The Godfather", 1972)
         );
 
-        when(movieDao.findAll()).thenReturn(movies);
+        when(movieService.findAll()).thenReturn(movies);
         when(response.getWriter()).thenReturn(writer);
 
         movieServlet.doGet(request, response);
 
         verify(response).setContentType("application/json; charset=UTF-8");
 
-        List<Movie> movieList = movieDao.findAll();
+        List<Movie> movieList = movieService.findAll();
         assertEquals(movies.size(), movieList.size());
     }
 
@@ -75,14 +75,14 @@ class MovieServletTest {
         when(request.getParameter("id")).thenReturn("1");
         Movie movie = new Movie(1L, "The Shawshank Redemption", 1994);
 
-        when(movieDao.findById(1L)).thenReturn(Optional.ofNullable(movie));
+        when(movieService.findById(1L)).thenReturn(Optional.ofNullable(movie));
         when(response.getWriter()).thenReturn(writer);
 
         movieServlet.doGet(request, response);
 
         verify(response).setContentType("application/json; charset=UTF-8");
 
-        Movie optionalMovie = movieDao.findById(1L).orElse(null);
+        Movie optionalMovie = movieService.findById(1L).orElse(null);
         assertEquals(movie.getName(), optionalMovie.getName());
     }
 
@@ -92,8 +92,8 @@ class MovieServletTest {
         when(response.getWriter()).thenReturn(writer);
 
         Movie movie = new Movie(1L, "The Shawshank Redemption", 1994);
-        when(movieDao.findById(1L)).thenReturn(Optional.ofNullable(movie));
-        when(movieDao.deleteMovieById(1L)).thenReturn(true);
+        when(movieService.findById(1L)).thenReturn(Optional.ofNullable(movie));
+        when(movieService.deleteMovieById(1L)).thenReturn(true);
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);

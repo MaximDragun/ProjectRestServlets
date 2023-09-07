@@ -2,13 +2,13 @@ package servlets;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.impl.DirectorDaoImpl;
 import models.Director;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import services.DirectorService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DirectorServletTest {
     @Mock
-    private DirectorDaoImpl directorDao;
+    private DirectorService directorService;
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -40,7 +40,7 @@ class DirectorServletTest {
     public void setUp() {
         directorServlet = new DirectorServlet();
         directorServlet.setObjectMapper(new ObjectMapper());
-        directorServlet.setDirectorDao(directorDao);
+        directorServlet.setDirectorService(directorService);
         StringWriter stringWriter = new StringWriter();
         writer = new PrintWriter(stringWriter);
     }
@@ -54,14 +54,14 @@ class DirectorServletTest {
                 new Director(2L, "Alfred Hitchcock", 78)
         );
 
-        when(directorDao.findAll()).thenReturn(directors);
+        when(directorService.findAll()).thenReturn(directors);
         when(response.getWriter()).thenReturn(writer);
 
         directorServlet.doGet(request, response);
 
         verify(response).setContentType("application/json; charset=UTF-8");
 
-        List<Director> directorList = directorDao.findAll();
+        List<Director> directorList = directorService.findAll();
         assertEquals(directors.size(), directorList.size());
     }
 
@@ -71,14 +71,14 @@ class DirectorServletTest {
         when(request.getParameter("id")).thenReturn("1");
         Director director = new Director(1L, "Stanley Kubrick", 56);
 
-        when(directorDao.findById(1L)).thenReturn(Optional.ofNullable(director));
+        when(directorService.findById(1L)).thenReturn(Optional.ofNullable(director));
         when(response.getWriter()).thenReturn(writer);
 
         directorServlet.doGet(request, response);
 
         verify(response).setContentType("application/json; charset=UTF-8");
 
-        Director optionalDirector = directorDao.findById(1L).orElse(null);
+        Director optionalDirector = directorService.findById(1L).orElse(null);
         assertEquals(director.getName(), optionalDirector.getName());
     }
 
@@ -88,8 +88,8 @@ class DirectorServletTest {
         when(response.getWriter()).thenReturn(writer);
 
         Director director = new Director(1L, "Stanley Kubrick", 56);
-        when(directorDao.findById(1L)).thenReturn(Optional.ofNullable(director));
-        when(directorDao.deleteDirectorById(1L)).thenReturn(true);
+        when(directorService.findById(1L)).thenReturn(Optional.ofNullable(director));
+        when(directorService.deleteDirectorById(1L)).thenReturn(true);
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);

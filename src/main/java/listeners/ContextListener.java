@@ -7,6 +7,13 @@ import dao.impl.MovieDaoImpl;
 import dao.interfaces.ActorDao;
 import dao.interfaces.DirectorDao;
 import dao.interfaces.MovieDao;
+import databaseconnaction.DataSourceConnaction;
+import services.ActorService;
+import services.DirectorService;
+import services.MovieService;
+import services.impl.ActorServiceImpl;
+import services.impl.DirectorServiceImpl;
+import services.impl.MovieServiceImpl;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -22,13 +29,20 @@ public class ContextListener implements ServletContextListener {
         final ServletContext servletContext =
                 servletContextEvent.getServletContext();
 
-        DirectorDao directorDao = new DirectorDaoImpl();
-        ActorDao actorDao = new ActorDaoImpl();
-        MovieDao movieDao = new MovieDaoImpl();
+        DataSourceConnaction dataSourceConnaction = new DataSourceConnaction();
+
+        DirectorDao directorDao = new DirectorDaoImpl(dataSourceConnaction);
+        ActorDao actorDao = new ActorDaoImpl(dataSourceConnaction);
+        MovieDao movieDao = new MovieDaoImpl(dataSourceConnaction);
         ObjectMapper objectMapper = new ObjectMapper();
-        servletContext.setAttribute("directorDao", directorDao);
-        servletContext.setAttribute("actorDao", actorDao);
-        servletContext.setAttribute("movieDao", movieDao);
+
+        DirectorService directorService= new DirectorServiceImpl(directorDao);
+        MovieService movieService= new MovieServiceImpl(movieDao);
+        ActorService actorService= new ActorServiceImpl(actorDao);
+
+        servletContext.setAttribute("directorService", directorService);
+        servletContext.setAttribute("actorService", actorService);
+        servletContext.setAttribute("movieService", movieService);
         servletContext.setAttribute("objectMapper", objectMapper);
     }
 
