@@ -15,7 +15,7 @@ import java.util.List;
 
 import static javax.servlet.http.HttpServletResponse.*;
 
-@WebServlet("/directors")
+@WebServlet("/director")
 public class DirectorServlet extends HttpServlet {
     private DirectorService directorService;
     private ObjectMapper objectMapper;
