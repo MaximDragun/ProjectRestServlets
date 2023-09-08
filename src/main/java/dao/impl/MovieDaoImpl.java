@@ -1,7 +1,7 @@
 package dao.impl;
 
 import dao.interfaces.MovieDao;
-import databaseconnaction.DataSourceConnaction;
+import databaseconnaction.DataSourceConnection;
 import exceptions.MySqlRuntimeException;
 import models.Actor;
 import models.Movie;
@@ -15,15 +15,15 @@ import static dao.impl.MovieDaoImpl.SQLTask.*;
 
 public class MovieDaoImpl implements MovieDao {
 
-    private DataSourceConnaction dataSourceConnaction;
+    private DataSourceConnection dataSourceConnection;
 
-    public MovieDaoImpl(DataSourceConnaction dataSourceConnaction) {
-        this.dataSourceConnaction = dataSourceConnaction;
+    public MovieDaoImpl(DataSourceConnection dataSourceConnection) {
+        this.dataSourceConnection = dataSourceConnection;
     }
 
     @Override
     public Movie addMovie(Movie movie) {
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(INSERT_MOVIE.QUERY, Statement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, movie.getName());
             pst.setInt(2, movie.getYearOfProduction());
@@ -45,7 +45,7 @@ public class MovieDaoImpl implements MovieDao {
     @Override
     public Optional<Movie> findById(Long id) {
         Movie movie = null;
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(GET_MOVIE_BY_ID.QUERY)) {
             pst.setLong(1, id);
 
@@ -64,7 +64,7 @@ public class MovieDaoImpl implements MovieDao {
     public List<Movie> findAll() {
         List<Movie> movies = new ArrayList<>();
 
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(GET_ALL_MOVIES.QUERY);
              ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
@@ -79,7 +79,7 @@ public class MovieDaoImpl implements MovieDao {
     @Override
     public boolean deleteMovieById(Long id) {
         int rowsUpdated;
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(DELETE_MOVIE_BY_ID.QUERY)) {
             pst.setLong(1, id);
             rowsUpdated = pst.executeUpdate();
@@ -92,7 +92,7 @@ public class MovieDaoImpl implements MovieDao {
     @Override
     public Movie updateMovieById(Movie movie) {
         int rowsUpdated;
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(UPDATE_MOVIE_BY_ID.QUERY)) {
             pst.setString(1, movie.getName());
             pst.setInt(2, movie.getYearOfProduction());
@@ -130,7 +130,7 @@ public class MovieDaoImpl implements MovieDao {
     private List<Actor> getMovieActors(Long movieId) {
         List<Actor> actorList = new ArrayList<>();
 
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(FIND_ALL_ACTORS.QUERY)) {
             pst.setLong(1, movieId);
 
@@ -152,7 +152,7 @@ public class MovieDaoImpl implements MovieDao {
     @Override
     public boolean insertMovieActor(Long movieId, Long actorId) {
         boolean result = false;
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(INSERT_MOVIE_ACTOR.QUERY)) {
 
             if (!isActorAndMovieExist(movieId, actorId)) {
@@ -168,7 +168,7 @@ public class MovieDaoImpl implements MovieDao {
     }
 
     private boolean isActorAndMovieExist(Long movieId, Long actorId) {
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(FIND_MOVIE_ACTOR.QUERY)) {
             pst.setLong(1, movieId);
             pst.setLong(2, actorId);

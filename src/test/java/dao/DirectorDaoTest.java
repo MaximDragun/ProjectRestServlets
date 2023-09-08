@@ -1,16 +1,13 @@
 package dao;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import dao.impl.DirectorDaoImpl;
 import dao.interfaces.DirectorDao;
-import databaseconnaction.DataSourceConnaction;
+import databaseconnaction.DataSourceConnection;
 import models.Director;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -24,7 +21,7 @@ class DirectorDaoTest {
             .withInitScript("db/NewTables.sql");
 
     DirectorDao directorDao;
-    DataSourceConnaction dataSourceConnaction;
+    DataSourceConnection dataSourceConnection;
 
     @BeforeAll
     static void beforeAll() {
@@ -38,14 +35,14 @@ class DirectorDaoTest {
 
     @BeforeEach
     void setUp() {
-        dataSourceConnaction = new DataSourceConnaction(postgres.getJdbcUrl(),
+        dataSourceConnection = new DataSourceConnection(postgres.getJdbcUrl(),
                 postgres.getUsername(), postgres.getPassword());
-        directorDao = new DirectorDaoImpl(dataSourceConnaction);
+        directorDao = new DirectorDaoImpl(dataSourceConnection);
     }
 
     @AfterEach
     void clearDatabase() {
-        try (Connection connection = dataSourceConnaction.getConnection()) {
+        try (Connection connection = dataSourceConnection.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM director");
         } catch (SQLException e) {

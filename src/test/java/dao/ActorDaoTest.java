@@ -2,7 +2,7 @@ package dao;
 
 import dao.impl.ActorDaoImpl;
 import dao.interfaces.ActorDao;
-import databaseconnaction.DataSourceConnaction;
+import databaseconnaction.DataSourceConnection;
 import models.Actor;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -23,7 +23,7 @@ class ActorDaoTest {
             .withInitScript("db/NewTables.sql");
 
     ActorDao actorDao;
-    DataSourceConnaction dataSourceConnaction;
+    DataSourceConnection dataSourceConnection;
 
     @BeforeAll
     static void beforeAll() {
@@ -37,14 +37,14 @@ class ActorDaoTest {
 
     @BeforeEach
     void setUp() {
-        dataSourceConnaction = new DataSourceConnaction(postgres.getJdbcUrl(),
+        dataSourceConnection = new DataSourceConnection(postgres.getJdbcUrl(),
                 postgres.getUsername(), postgres.getPassword());
-        actorDao = new ActorDaoImpl(dataSourceConnaction);
+        actorDao = new ActorDaoImpl(dataSourceConnection);
     }
 
     @AfterEach
     void clearDatabase() {
-        try (Connection connection = dataSourceConnaction.getConnection()) {
+        try (Connection connection = dataSourceConnection.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM actor");
         } catch (SQLException e) {

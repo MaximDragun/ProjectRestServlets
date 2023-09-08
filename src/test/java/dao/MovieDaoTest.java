@@ -6,7 +6,7 @@ import dao.impl.MovieDaoImpl;
 import dao.interfaces.ActorDao;
 import dao.interfaces.DirectorDao;
 import dao.interfaces.MovieDao;
-import databaseconnaction.DataSourceConnaction;
+import databaseconnaction.DataSourceConnection;
 import models.Actor;
 import models.Director;
 import models.Movie;
@@ -29,7 +29,7 @@ class MovieDaoTest {
     DirectorDao directorDao;
     MovieDao movieDao;
     ActorDao actorDao;
-    DataSourceConnaction dataSourceConnaction;
+    DataSourceConnection dataSourceConnection;
 
     @BeforeAll
     static void beforeAll() {
@@ -43,16 +43,16 @@ class MovieDaoTest {
 
     @BeforeEach
     void setUp() {
-        dataSourceConnaction = new DataSourceConnaction(postgres.getJdbcUrl(),
+        dataSourceConnection = new DataSourceConnection(postgres.getJdbcUrl(),
                 postgres.getUsername(), postgres.getPassword());
-        directorDao = new DirectorDaoImpl(dataSourceConnaction);
-        movieDao = new MovieDaoImpl(dataSourceConnaction);
-        actorDao = new ActorDaoImpl(dataSourceConnaction);
+        directorDao = new DirectorDaoImpl(dataSourceConnection);
+        movieDao = new MovieDaoImpl(dataSourceConnection);
+        actorDao = new ActorDaoImpl(dataSourceConnection);
     }
 
     @AfterEach
     void clearDatabase() {
-        try (Connection connection = dataSourceConnaction.getConnection()) {
+        try (Connection connection = dataSourceConnection.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM director");
             statement.executeUpdate("DELETE FROM actor");

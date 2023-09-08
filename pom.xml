@@ -5,8 +5,8 @@
     <artifactId>ProjectRestServlets</artifactId>
     <packaging>war</packaging>
     <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <version>1.0-SNAPSHOT</version>
     <name>ProjectRestServlets Maven Webapp</name>

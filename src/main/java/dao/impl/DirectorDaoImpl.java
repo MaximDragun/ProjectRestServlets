@@ -1,7 +1,7 @@
 package dao.impl;
 
 import dao.interfaces.DirectorDao;
-import databaseconnaction.DataSourceConnaction;
+import databaseconnaction.DataSourceConnection;
 import exceptions.MySqlRuntimeException;
 import models.Director;
 import models.Movie;
@@ -15,15 +15,15 @@ import static dao.impl.DirectorDaoImpl.SQLTask.*;
 
 public class DirectorDaoImpl implements DirectorDao {
 
-    private DataSourceConnaction dataSourceConnaction;
+    private DataSourceConnection dataSourceConnection;
 
-    public DirectorDaoImpl(DataSourceConnaction dataSourceConnaction) {
-        this.dataSourceConnaction = dataSourceConnaction;
+    public DirectorDaoImpl(DataSourceConnection dataSourceConnection) {
+        this.dataSourceConnection = dataSourceConnection;
     }
 
     @Override
     public Director addDirector(Director director) {
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(INSERT_DIRECTOR.QUERY, Statement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, director.getName());
             pst.setInt(2, director.getAge());
@@ -44,7 +44,7 @@ public class DirectorDaoImpl implements DirectorDao {
     @Override
     public Optional<Director> findById(Long id) {
         Director director = null;
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(GET_DIRECTOR_BY_ID.QUERY)) {
             pst.setLong(1, id);
 
@@ -64,7 +64,7 @@ public class DirectorDaoImpl implements DirectorDao {
     public List<Director> findAll() {
         List<Director> directors = new ArrayList<>();
 
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(GET_ALL_DIRECTORS.QUERY);
              ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
@@ -79,7 +79,7 @@ public class DirectorDaoImpl implements DirectorDao {
     @Override
     public boolean deleteDirectorById(Long id) {
         int rowsUpdated;
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(DELETE_DIRECTOR_BY_ID.QUERY)) {
             pst.setLong(1, id);
             rowsUpdated = pst.executeUpdate();
@@ -92,7 +92,7 @@ public class DirectorDaoImpl implements DirectorDao {
     @Override
     public Director updateDirectorById(Director director) {
         int rowsUpdated;
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(UPDATE_DIRECTOR_BY_ID.QUERY)) {
             pst.setString(1, director.getName());
             pst.setInt(2, director.getAge());
@@ -126,7 +126,7 @@ public class DirectorDaoImpl implements DirectorDao {
     private List<Movie> getDirectorMovies(Long directorId) {
         List<Movie> movieList = new ArrayList<>();
 
-        try (Connection connection = dataSourceConnaction.getConnection();
+        try (Connection connection = dataSourceConnection.getConnection();
              PreparedStatement pst = connection.prepareStatement(FIND_ALL_MOVIES.QUERY)) {
             pst.setLong(1, directorId);
 

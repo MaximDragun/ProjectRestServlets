@@ -7,13 +7,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class DataSourceConnaction {
+public class DataSourceConnection {
     private final String dbUrl;
     private final String username;
     private final String password;
     private final String driver;
 
-    public DataSourceConnaction() {
+    public DataSourceConnection() {
         Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("hikari.properties")) {
             properties.load(input);
@@ -31,7 +31,7 @@ public class DataSourceConnaction {
         }
     }
 
-    public DataSourceConnaction(String dbUrl, String username, String password) {
+    public DataSourceConnection(String dbUrl, String username, String password) {
         this.dbUrl = dbUrl;
         this.username = username;
         this.password = password;

@@ -7,7 +7,7 @@ import dao.impl.MovieDaoImpl;
 import dao.interfaces.ActorDao;
 import dao.interfaces.DirectorDao;
 import dao.interfaces.MovieDao;
-import databaseconnaction.DataSourceConnaction;
+import databaseconnaction.DataSourceConnection;
 import services.ActorService;
 import services.DirectorService;
 import services.MovieService;
@@ -29,11 +29,11 @@ public class ContextListener implements ServletContextListener {
         final ServletContext servletContext =
                 servletContextEvent.getServletContext();
 
-        DataSourceConnaction dataSourceConnaction = new DataSourceConnaction();
+        DataSourceConnection dataSourceConnection = new DataSourceConnection();
 
-        DirectorDao directorDao = new DirectorDaoImpl(dataSourceConnaction);
-        ActorDao actorDao = new ActorDaoImpl(dataSourceConnaction);
-        MovieDao movieDao = new MovieDaoImpl(dataSourceConnaction);
+        DirectorDao directorDao = new DirectorDaoImpl(dataSourceConnection);
+        ActorDao actorDao = new ActorDaoImpl(dataSourceConnection);
+        MovieDao movieDao = new MovieDaoImpl(dataSourceConnection);
         ObjectMapper objectMapper = new ObjectMapper();
 
         DirectorService directorService= new DirectorServiceImpl(directorDao);
