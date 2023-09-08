@@ -1,1 +1,1 @@
-MyNewApp.
+MyNewApp
